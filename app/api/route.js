@@ -23,76 +23,19 @@ export async function POST(req) {
   const params = await req.json();
 
   let response;
-  if (params.image) {
-    response = await runLlava(params);
-  } else if (params.audio) {
-    response = await runSalmonn(params);
-  } else {
-    response = await runLlama(params);
-  }
-
+  response = await runLlama(params);
   // Convert the response into a friendly text-stream
   const stream = await ReplicateStream(response);
   // Respond with the stream
   return new StreamingTextResponse(stream);
 }
 
-async function runLlama({
-  model,
-  prompt,
-  systemPrompt,
-  maxTokens,
-  temperature,
-  topP,
-}) {
-  console.log("running llama");
-  console.log("model", model);
-  console.log("maxTokens", maxTokens);
-
+async function runLlama({ prompt }) {
   return await replicate.predictions.create({
-    model: model,
+    model: "meta/meta-llama-3-8b-instruct",
     stream: true,
     input: {
       prompt: `${prompt}`,
-      max_new_tokens: maxTokens,
-      ...(model.includes("llama3")
-        ? { max_tokens: maxTokens }
-        : { max_new_tokens: maxTokens }),
-      temperature: temperature,
-      repetition_penalty: 1,
-      top_p: topP,
     },
-  });
-}
-
-async function runLlava({ prompt, maxTokens, temperature, topP, image }) {
-  console.log("running llava");
-
-  return await replicate.predictions.create({
-    stream: true,
-    input: {
-      prompt: `${prompt}`,
-      top_p: topP,
-      temperature: temperature,
-      max_tokens: maxTokens,
-      image: image,
-    },
-    version: VERSIONS["yorickvp/llava-13b"],
-  });
-}
-
-async function runSalmonn({ prompt, maxTokens, temperature, topP, audio }) {
-  console.log("running salmonn");
-
-  return await replicate.predictions.create({
-    stream: true,
-    input: {
-      prompt: `${prompt}`,
-      top_p: topP,
-      temperature: temperature,
-      max_length: maxTokens,
-      wav_path: audio,
-    },
-    version: VERSIONS["nateraw/salmonn"],
   });
 }

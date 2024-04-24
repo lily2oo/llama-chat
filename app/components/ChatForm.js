@@ -1,6 +1,4 @@
-import Metrics from "./Metrics";
-
-const ChatForm = ({ prompt, setPrompt, onSubmit, metrics, completion }) => {
+const ChatForm = ({ prompt, setPrompt, onSubmit }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     onSubmit(prompt);
@@ -18,13 +16,6 @@ const ChatForm = ({ prompt, setPrompt, onSubmit, metrics, completion }) => {
   return (
     <footer className="z-10 fixed bottom-0 left-0 right-0 bg-slate-100 border-t-2">
       <div className="container max-w-2xl mx-auto px-5 py-7">
-        <Metrics
-          startedAt={metrics.startedAt}
-          firstMessageAt={metrics.firstMessageAt}
-          completedAt={metrics.completedAt}
-          completion={completion}
-        />
-
         <form className="w-full flex" onSubmit={handleSubmit}>
           <input
             autoComplete="off"
